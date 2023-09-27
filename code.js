@@ -1,115 +1,165 @@
-// Function to extract data or set to blank if not found
-function extractValueOrBlank(element, selector) {
-  var selectedElement = element.querySelector(selector);
-  console.log("element=" + element + " " + "selector =" + selector)
-  return selectedElement ? selectedElement.textContent.trim() : '';
-}
-
 var html = document.documentElement.outerHTML;
-
-// Create a new DOMParser
 var parser = new DOMParser();
-
-// Parse the HTML
 var doc = parser.parseFromString(html, 'text/html');
-
-// Select all card elements in the DOM
 var cardElements = doc.querySelectorAll('.coupons_results-list-item');
-
-// Create an array to store JSON objects for each card
 var cardDataList = [];
-
-// Loop through each card element
-cardElements.forEach((cardElement) => {
-  var brand = extractValueOrBlank(cardElement, '.deal-card__brand');
-  //var name = extractValueOrBlank(cardElement, '.deal-card__name').replace("Save|Spend","");
-
-var rawValue = extractValueOrBlank(cardElement, '.deal-card__name');
-	var priceMatches = rawValue.match(/\$\d+(\.\d{2})?/);
-	var name = priceMatches && priceMatches[0] ? priceMatches[0] : rawValue;  // do nothing if no match
-
-  var description = extractValueOrBlank(cardElement, '.deal-card__description');
-
-  var expiration = extractValueOrBlank(cardElement, '.deal-card__expiration').replace(/.*?(\d{2}\/\d{2}\/\d{2}).*/g, '$1');
-//var href = extractValueOrBlank(cardElement, 'a.deal-card__image-wrapper['href']');
-
-
-const elementhref = cardElement.querySelector('.deal-card__image-wrapper');
-
-if (elementhref) {
-  var href = elementhref.getAttribute('href');
-  console.log(href); // This will log the href attribute value
-} else {
-  console.error('Element not found.');
-}  
-  
-
-objHref = parseURL(href) 
-urlProtocol = objHref.protocol;
-urlHost =  objHref.host;
-  
-  
-  // Extract the coupon type
-var couponType = extractValueOrBlank(cardElement,('.deal-card__coupon-type'));
-
-
+var brand = "";
 var couponDescription = "";
-  //if the first part of the description contains a price then include the word "Save " otherwise do not
-  //var couponSave = " coupon - Save "; or  couponSave = " ";
-  couponSave = " ";
-  if(couponType.toLowerCase() == "dg store")
-    {
-      couponDescription = couponType + couponSave + name +" "+ description;
-    }else if(couponType.toLowerCase() == "manufacture"){
-      couponDescription = couponType + couponSave + brand +" "+ name + " " + description;
+var rawValue = "";
+var priceMatches = "";
+var cashBack = "";
+var description = "";
+var expiration = "";
+var couponIdElement = "";
+var elementhref = "";
+var href = "";
+var couponType = "";
+var cardData = {};
+cardElements.forEach((cardElement) => {
+  try {
+    brand = extractValueOrBlank(cardElement, '.deal-card__brand');
+  } catch {
+    //do something
+  }
+
+  try {
+    rawValue = extractValueOrBlank(cardElement, '.deal-card__name');
+    priceMatches = rawValue.match(/\$\d+(\.\d{2})?/);
+    cashBack = priceMatches && priceMatches[0] ? priceMatches[0] : rawValue;  // do nothing if no match
+  } catch {
+    //do something
+  }
+  
+  try {
+    description = extractValueOrBlank(cardElement, '.deal-card__description');
+  } catch {
+    //do something
+  }
+  
+  try {
+    expiration = extractValueOrBlank(cardElement, '.deal-card__expiration').replace(/.*?(\d{2}\/\d{2}\/\d{2}).*/g, '$1');
+    couponIdElement = cardElement.querySelector('.deal-card__add-button');
+    if (couponIdElement) {
+      var couponId = couponIdElement.getAttribute('data-deal-code');
+      if (couponId == "") {
+        couponId = "cc-" + Math.random().toString(36).substring(7);
+      }
+
     }
-  /*RULES
-  expiration = dealCardExpire.replace("Exp; ","");
-dateofinsert = DIGITAL
-source = DOLLAR GENERAL
-couponValue = dealCardName.replace("Save|Spend","")
+  } catch {
+    expiration = "";
+    couponId = "cc-" + Math.random().toString(36).substring(7);
+  }
+  elementhref = cardElement.querySelector('.deal-card__image-wrapper');
 
-If the couponType is "DG Store" then
-	couponDescription = couponType + "coupon - " + dealCardName +" "+ dealCardDescription
-else if couponType is "manufacture" then
-	couponDescription = dealcardcoupontype + " coupon - " + dealcardbrand + " " + dealcardName + " " + dealCardDescription
-end if
+  if (elementhref) {
+    href = elementhref.getAttribute('href');
+  } else {
+    //do something
+  }
+
+  objHref = parseURL(href)
+  urlProtocol = objHref.protocol;
+  urlHost = objHref.host;
   
-  				<th>Coupon Description</th> ["offerName"] 
-				<th>Coupon Value</th> ["cashBack"]
-				<th>Expiration Date</th>["expiration"] 
-  
-  */
-  
+  couponType = extractValueOrBlank(cardElement, ('.deal-card__coupon-type'));
+  couponSave = " ";
+  if (couponType.toLowerCase() == "dg store") {
+    couponDescription = couponType + couponSave + cashBack + " " + description;
+  } else if (couponType.toLowerCase() == "manufacturer") {
+    couponDescription = couponType + couponSave + brand + " " + cashBack + " " + description;
+  } else {
+    couponDescription = "couponType=" + couponType + "brand=" + brand + "cashBack=" + cashBack + "description=" + description
+  }
+
+  if (couponDescription != "" && cashBack != "") {
     var cardData = {
-      cashBack:name,
-      offerName:couponDescription,
-      offerDetails:"",
-      expiration:expiration,
-      insertDate:"DIGITAL",
-      insertId:"DOLLAR GENERAL",
-      url:urlProtocol + "//" +urlHost + href,
-      categories:"",
-      source:"DOLLAR GENERAL",
-      couponId:Math.random().toString(36).substring(7)
+      cashBack: cashBack,
+      offerName: couponDescription,
+      offerDetails: "",
+      expiration: expiration,
+      insertDate: "DIGITAL",
+      insertId: "DOLLAR GENERAL",
+      url: urlProtocol + "//" + urlHost + href,
+      categories: "",
+      source: "DOLLAR GENERAL",
+      couponId: couponId
     };
-
-  // Add the card data to the array
+  } else {
+    cardData = {
+      error: "missing name and description",
+      url: urlProtocol + "//" + urlHost + href,
+      couponId: couponId
+    };
+  }
   cardDataList.push(cardData);
 });
 
 // Log the array of JSON objects
 console.log(JSON.stringify(cardDataList, null, 2));
-        function parseURL(url) {
-          const parser = document.createElement('a');
-          parser.href = url;
-          return {
-            protocol: parser.protocol,
-            host: parser.host,
-            hostname: parser.hostname,
-            port: parser.port,
-            pathname: parser.pathname,
-            search: parser.search,
-            hash: parser.hash,
-          };
-        }
+
+// Function to extract data or set to blank if not found
+function extractValueOrBlank(element, selector) {
+  var selectedElement = element.querySelector(selector);
+  return selectedElement ? selectedElement.textContent.trim() : '';
+}
+
+function parseURL(url) {
+  const parser = document.createElement('a');
+  parser.href = url;
+  return {
+    protocol: parser.protocol,
+    host: parser.host,
+    hostname: parser.hostname,
+    port: parser.port,
+    pathname: parser.pathname,
+    search: parser.search,
+    hash: parser.hash,
+  };
+}
+
+// Function to click the "Load more" button
+function clickLoadMoreButton() {
+  const loadMoreButton = document.querySelector('.coupons-results__load-more-button');
+  if (loadMoreButton) {
+    loadMoreButton.click();
+    setTimeout(clickLoadMoreButton, 1000); // Click every second (adjust the delay as needed)
+  }
+}
+//go();
+// Listen for the DOMContentLoaded event to ensure the page has loaded
+// Function to click the "Load more" button
+function clickLoadMoreButton() {
+  const loadMoreButton = document.querySelector('.coupons-results__load-more-button');
+  if (loadMoreButton && !loadMoreButton.classList.contains('hidden')) {
+    loadMoreButton.click();
+    setTimeout(clickLoadMoreButton, 1000); // Click every second (adjust the delay as needed)
+  }
+}
+go();//go is just for testing since we are pushing the run button in the console and not attaching this code directly
+// Listen for the DOMContentLoaded event to ensure the page has loaded
+//document.addEventListener('DOMContentLoaded', () => {
+function go(){
+// Start clicking the button immediately when the page loads
+  clickLoadMoreButton();
+
+  // Function to begin parsing after clicking stops (e.g., button is no longer in the DOM or is hidden)
+  function startParsing() {
+    // Your parsing logic here
+    console.log('Parsing the page...');
+  }
+
+  // Check for the presence and visibility of the "Load more" button at regular intervals
+  const checkButtonInterval = setInterval(() => {
+    const loadMoreButton = document.querySelector('.coupons-results__load-more-button');
+    if (!loadMoreButton || loadMoreButton.classList.contains('hidden')) {
+      // The button is no longer in the DOM or is hidden, so start parsing
+      clearInterval(checkButtonInterval);
+      startParsing();
+    }
+  }, 1000); // Check every second (adjust the interval as needed)
+};
+
+
+
+
