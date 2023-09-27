@@ -1,3 +1,4 @@
+function startParsing(){
 var html = document.documentElement.outerHTML;
 var parser = new DOMParser();
 var doc = parser.parseFromString(html, 'text/html');
@@ -97,7 +98,7 @@ cardElements.forEach((cardElement) => {
 
 // Log the array of JSON objects
 console.log(JSON.stringify(cardDataList, null, 2));
-
+}
 // Function to extract data or set to blank if not found
 function extractValueOrBlank(element, selector) {
   var selectedElement = element.querySelector(selector);
@@ -126,7 +127,6 @@ function clickLoadMoreButton() {
     setTimeout(clickLoadMoreButton, 1000); // Click every second (adjust the delay as needed)
   }
 }
-//go();
 // Listen for the DOMContentLoaded event to ensure the page has loaded
 // Function to click the "Load more" button
 function clickLoadMoreButton() {
