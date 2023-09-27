@@ -1,6 +1,7 @@
 // Function to extract data or set to blank if not found
 function extractValueOrBlank(element, selector) {
   var selectedElement = element.querySelector(selector);
+  console.log("element=" + element + " " + "selector =" + selector)
   return selectedElement ? selectedElement.textContent.trim() : '';
 }
 
@@ -30,8 +31,24 @@ var rawValue = extractValueOrBlank(cardElement, '.deal-card__name');
   var description = extractValueOrBlank(cardElement, '.deal-card__description');
 
   var expiration = extractValueOrBlank(cardElement, '.deal-card__expiration').replace(/.*?(\d{2}\/\d{2}\/\d{2}).*/g, '$1');
-var href = extractValueOrBlank(cardElement, '.deal-card__image-wrapper > a');
+//var href = extractValueOrBlank(cardElement, 'a.deal-card__image-wrapper['href']');
 
+
+const elementhref = cardElement.querySelector('.deal-card__image-wrapper');
+
+if (elementhref) {
+  var href = elementhref.getAttribute('href');
+  console.log(href); // This will log the href attribute value
+} else {
+  console.error('Element not found.');
+}  
+  
+
+objHref = parseURL(href) 
+urlProtocol = objHref.protocol;
+urlHost =  objHref.host;
+  
+  
   // Extract the coupon type
 var couponType = extractValueOrBlank(cardElement,('.deal-card__coupon-type'));
 
@@ -71,7 +88,7 @@ end if
       expiration:expiration,
       insertDate:"DIGITAL",
       insertId:"DOLLAR GENERAL",
-      url:window.href + href,
+      url:urlProtocol + "//" +urlHost + "/" + href,
       categories:"",
       source:"DOLLAR GENERAL",
       couponId:Math.random().toString(36).substring(7)
@@ -83,3 +100,16 @@ end if
 
 // Log the array of JSON objects
 console.log(JSON.stringify(cardDataList, null, 2));
+        function parseURL(url) {
+          const parser = document.createElement('a');
+          parser.href = url;
+          return {
+            protocol: parser.protocol,
+            host: parser.host,
+            hostname: parser.hostname,
+            port: parser.port,
+            pathname: parser.pathname,
+            search: parser.search,
+            hash: parser.hash,
+          };
+        }
