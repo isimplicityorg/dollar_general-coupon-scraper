@@ -88,7 +88,7 @@ end if
       expiration:expiration,
       insertDate:"DIGITAL",
       insertId:"DOLLAR GENERAL",
-      url:urlProtocol + "//" +urlHost + "/" + href,
+      url:urlProtocol + "//" +urlHost + href,
       categories:"",
       source:"DOLLAR GENERAL",
       couponId:Math.random().toString(36).substring(7)
