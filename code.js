@@ -124,7 +124,7 @@ function scrollDown(element){
   window.scrollTo(0, window.scrollY + 500);
   //OR
   // Using scrollIntoView:
-element.scrollIntoView();
+	element.scrollIntoView();
 }
 // Listen for the DOMContentLoaded event to ensure the page has loaded
 // Function to click the "Load more" button
@@ -132,9 +132,13 @@ function clickLoadMoreButton() {
   const loadMoreButton = document.querySelector('.coupons-results__load-more-button');
   if (loadMoreButton && !loadMoreButton.classList.contains('hidden')) {
     loadMoreButton.click();
+    scrollDown(loadMoreButton);
     setTimeout(clickLoadMoreButton, 1000); // Click every second (adjust the delay as needed)
+  }else{
+    console.log("now scrape the page")
   }
 }
+
 go();//go is just for testing since we are pushing the run button in the console and not attaching this code directly
 // Listen for the DOMContentLoaded event to ensure the page has loaded
 //document.addEventListener('DOMContentLoaded', () => {
