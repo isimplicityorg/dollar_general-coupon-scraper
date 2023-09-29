@@ -136,33 +136,8 @@ function clickLoadMoreButton() {
     setTimeout(clickLoadMoreButton, 1000); // Click every second (adjust the delay as needed)
   }else{
     console.log("now scrape the page")
+    startParsing();
   }
 }
 
-go();//go is just for testing since we are pushing the run button in the console and not attaching this code directly
-// Listen for the DOMContentLoaded event to ensure the page has loaded
-//document.addEventListener('DOMContentLoaded', () => {
-function go(){
-// Start clicking the button immediately when the page loads
-  clickLoadMoreButton();
-
-  // Function to begin parsing after clicking stops (e.g., button is no longer in the DOM or is hidden)
-  function startParsing() {
-    // Your parsing logic here
-    console.log('Parsing the page...');
-  }
-
-  // Check for the presence and visibility of the "Load more" button at regular intervals
-  const checkButtonInterval = setInterval(() => {
-    const loadMoreButton = document.querySelector('.coupons-results__load-more-button');
-    if (!loadMoreButton || loadMoreButton.classList.contains('hidden')) {
-      // The button is no longer in the DOM or is hidden, so start parsing
-      clearInterval(checkButtonInterval);
-      startParsing();
-    }
-  }, 1000); // Check every second (adjust the interval as needed)
-};
-
-
-
-
+clickLoadMoreButton();
