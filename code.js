@@ -118,14 +118,13 @@ function parseURL(url) {
     hash: parser.hash,
   };
 }
-
-// Function to click the "Load more" button
-function clickLoadMoreButton() {
-  const loadMoreButton = document.querySelector('.coupons-results__load-more-button');
-  if (loadMoreButton) {
-    loadMoreButton.click();
-    setTimeout(clickLoadMoreButton, 1000); // Click every second (adjust the delay as needed)
-  }
+function scrollDown(element){
+  window.scrollBy(0, 500);
+  //OR                    
+  window.scrollTo(0, window.scrollY + 500);
+  //OR
+  // Using scrollIntoView:
+element.scrollIntoView();
 }
 // Listen for the DOMContentLoaded event to ensure the page has loaded
 // Function to click the "Load more" button
