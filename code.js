@@ -235,13 +235,13 @@ function createCouponId(prefix) {
 
 // Create a dynamic lightbox modal
 function createModal(message) {
-  let modal = document.createElement('div');
+  var modal = document.createElement('div');
   modal.className = 'modal';
   document.body.appendChild(modal);
-  let modalContent = document.createElement('div');
+  var modalContent = document.createElement('div');
   modalContent.className = 'modal-content';
   modal.appendChild(modalContent);
-  let messageElement = document.createElement('p');
+  var messageElement = document.createElement('p');
   messageElement.textContent = message;
   messageElement.style.fontSize = '18px';
   messageElement.style.color = 'green';
