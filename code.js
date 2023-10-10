@@ -23,9 +23,18 @@ function startParsing() {
     }
 
     try {
+    //this should be the word 'Save' if there is a price as the first word in the description
+    //ex. Save $1.00 
+    //var cashBackDesc =  addPrefixForPrice(cashBack)// 'Save ' is the default value to prepend, 
+    //but you can change it by sending a different string as the second argument 
+
       rawValue = extractValueOrBlank(cardElement, '.deal-card__name');
       priceMatches = rawValue.match(/\$\d+(\.\d{2})?/);
-      cashBack = priceMatches && priceMatches[0] ? priceMatches[0] : rawValue;  // do nothing if no match
+      //this is the cash back to be used in the Coupon Description
+      cashBack = priceMatches && priceMatches[0] ? addPrefixForPrice(priceMatches[0]) : rawValue;  // do nothing if no match
+      //this is the cash back to be used in the Coupon Value
+      cashBackValue = priceMatches && priceMatches[0] ? priceMatches[0] : rawValue;  // do nothing if no match
+
     } catch {
       //do something
     }
@@ -63,19 +72,22 @@ function startParsing() {
     urlHost = objHref.host;
 
     couponType = extractValueOrBlank(cardElement, ('.deal-card__coupon-type'));
-    couponSave = " ";
+    //if description has Save as the first word then don't add it again
+    if (description.toLowerCase().startsWith("save")) {cashBack = ""};
+    
     if (couponType.toLowerCase() == "dg store") {
-      couponDescription = couponSave + cashBack + " " + description + "-" + couponType;
+      couponDescription = cashBack + " " + description + " - " + couponType + " Coupon";
     } else if (couponType.toLowerCase() == "manufacturer") {
-      couponDescription = couponSave + brand + " " + cashBack + " " + description + "-" + couponType;
+      couponDescription = brand + " " + cashBack + " " + description + " - " + couponType + " Coupon";
     } else {
-      couponDescription =  "brand=" + brand + " cashBack=" + cashBack + " description=" + description + " couponType=" + couponType;
+      couponDescription = "brand=" + brand + " cashBack=" + cashBack + " description=" + description + " couponType=" + couponType;
     }
+
     items = [
-      cashBack,
       couponDescription,
-      "",
+      cashBackValue,
       expiration,
+      description,
       "DIGITAL",
       "DOLLAR GENERAL",
       urlProtocol + "//" + urlHost + href,
@@ -83,7 +95,7 @@ function startParsing() {
       "DOLLAR GENERAL",
       couponId
     ];
-    
+
     if (couponDescription != "" && cashBack != "") {
       var cardData = createDatabaseJson(items);
     } else {
