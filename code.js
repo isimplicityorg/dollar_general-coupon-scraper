@@ -16,19 +16,23 @@ function startParsing() {
   var href = "";
   var couponType = "";
   cardElements.forEach((cardElement) => {
+    //if the badge = CASH BACK then skip this coupon because it will be a duplicate also found in IBOTTA-DOLLARGENERAL
+    dealCardBadge = extractValueOrBlank(cardElement, '.deal-card__badge');
+    //<div class="deal-card__badge deal-card__badge--cb">CASH BACK</div>
+    if (dealCardBadge.toLowerCase() != "cash back") {
     try {
       brand = extractValueOrBlank(cardElement, '.deal-card__brand');
     } catch {
       //do something
     }
-
+  
     try {
     //this should be the word 'Save' if there is a price as the first word in the description
     //ex. Save $1.00 
     //var cashBackDesc =  addPrefixForPrice(cashBack)// 'Save ' is the default value to prepend, 
     //but you can change it by sending a different string as the second argument 
-
-      rawValue = extractValueOrBlank(cardElement, '.deal-card__name');
+    
+    rawValue = extractValueOrBlank(cardElement, '.deal-card__name');
       priceMatches = rawValue.match(/\$\d+(\.\d{2})?/);
       //this is the cash back to be used in the Coupon Description
       cashBack = priceMatches && priceMatches[0] ? addPrefixForPrice(priceMatches[0]) : rawValue;  // do nothing if no match
@@ -78,7 +82,7 @@ function startParsing() {
     if (couponType.toLowerCase() == "dg store") {
       couponDescription = cashBack + " " + description + " - " + couponType + " Coupon";
     } else if (couponType.toLowerCase() == "manufacturer") {
-      couponDescription = brand + " " + cashBack + " " + description + " - " + couponType + " Coupon";
+      couponDescription = brand + " | " + cashBack + " " + description + " - " + couponType + " Coupon";
     } else {
       couponDescription = "brand=" + brand + " cashBack=" + cashBack + " description=" + description + " couponType=" + couponType;
     }
@@ -107,6 +111,7 @@ function startParsing() {
     	
     }
     cardDataList.push(cardData);
+  }
   });
 
   // Log the array of JSON objects
